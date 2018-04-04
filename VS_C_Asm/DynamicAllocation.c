@@ -53,9 +53,9 @@ int __declspec(naked) Free(int addr)
 		rep stosd
 
 		mov eax, dword ptr es : [ebp + 0x8]	; Copy the parameter from previous stack
-		push eax							; Pass in the addr to free
-		call free							; Call the free function
-		add esp, 4							; balance the stack
+		push eax				; Pass in the addr to free
+		call free				; Call the free function
+		add esp, 4				; balance the stack
 
 		pop ebx
 		pop edi
