@@ -2,92 +2,98 @@
 #include <malloc.h>
 
 /*
-Designed dynamic allocation using parameter 
+Designed dynamic allocation using pointer to parameters
 */
 
-int __declspec(naked) PassPointerAllocation(int addr)
+int __declspec(naked) PassPointerAllocation(int addr, int value)
 {
-    __asm
-    {
-        push ebp
-        mov ebp, esp
-        sub esp, 0x40
+	__asm
+	{
+		push ebp
+		mov ebp, esp
+		sub esp, 0x40
 
-        push esi
-        push edi
-        push ebx
+		push esi
+		push edi
+		push ebx
 
-        lea edi, dword ptr es:[esp + 0xc]
-        mov eax, 0xcccccccc
-        mov ecx, 0x10
-        rep stosd
+		lea edi, dword ptr es : [esp + 0xc]
+		mov eax, 0xcccccccc
+		mov ecx, 0x10
+		rep stosd
 
-;Add dynamic allocation here
-        
-        push 0x4
-        call malloc
-        add esp, 4
+		; Add dynamic allocation here
 
-;Move the pointer of the space into the pointer to the parameter
+		push 0x4
+		call malloc
+		add esp, 4
 
-        mov ebx, dword ptr es:[esp + 0xc]
-        mov dword ptr es:[ebx], eax
+		; Move the pointer of the space into the pointer to the parameter
 
-;End of the operation of the dynamic allocation 
+		mov ebx, dword ptr es : [ebp + 0x8]
+		mov dword ptr es : [ebx], eax
 
-        pop ebx
-        pop edi
-        pop esi
+		; Copy value into the space
 
-        mov esp, ebp
-        pop ebp
-        ret
-    }
+		mov ebx, dword ptr es : [ebp + 0xc]
+		mov dword ptr es : [eax], ebx 
+
+		; End of the operation of the dynamic allocation
+
+		pop ebx
+		pop edi
+		pop esi
+
+		mov esp, ebp
+		pop ebp
+		ret
+	}
 }
 
 int __declspec(naked) PassPointerFree(int addr)
 {
-    __asm
-    {
-        push esp
-        mov ebp, esp
-        sub esp, 0x40
+	__asm
+	{
+		push esp
+		mov ebp, esp
+		sub esp, 0x40
 
-        push esi
-        push edi
-        push esi
+		push esi
+		push edi
+		push esi
 
-        lea edi, dword ptr es:[esp + 0xc]
-        mov eax, 0xcccccccc
-        mov ecx, 0x10
-        rep stosd
+		lea edi, dword ptr es : [esp + 0xc]
+		mov eax, 0xcccccccc
+		mov ecx, 0x10
+		rep stosd
 
-;Free the dynamic allocation here
+		; Free the dynamic allocation here
 
-        mov eax, dword ptr es:[ebp + 0x8]
-        push eax
-        call free
-        add esp, 4
+		mov eax, dword ptr es : [ebp + 0x8]
+		push eax
+		call free
+		add esp, 4
 
-;End of the operation of the dynamic allocation
+		; End of the operation of the dynamic allocation
 
-        pop ebx
-        pop edi
-        pop esi
+		pop ebx
+		pop edi
+		pop esi
 
-        mov esp, ebp
-        pop ebp
-        ret
-    }
+		mov esp, ebp
+		pop ebp
+		ret
+	}
 }
 
 int main(void)
 {
-    int addr = 0;
-    PassPointerAllocation(addr);
-    printf("%d\n", *((int*)addr));
-    PassPointerFree(addr);
-    return 0;
+	// Address of a dynamic-allocated memory, using int instead of int *
+	int addr = 0;
+	// Mallocation
+	PassPointerAllocation(&addr, 0x55555555);
+	printf("%X\n", *((int*)addr));
+	// Free
+	PassPointerFree(addr);
+	return 0;
 }
-
-
