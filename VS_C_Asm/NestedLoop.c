@@ -1,79 +1,86 @@
 #include <stdio.h>
 
 /*
-Demo of designed Nested Loop in assembly 
+Demo of designed Nested Loop in assembly
 */
 
 int __declspec(naked) NestedWhileLoop()
 {
-    __asm
-    {
-        push ebp
-        mov ebp, esp
-        sub esp, 0x20
+	__asm
+	{
+		push ebp
+		mov ebp, esp
+		sub esp, 0x20
 
-        push esi
-        push edi
-        push ebx
+		push esi
+		push edi
+		push ebx
 
-        lea edi, dword ptr es:[esp + 0xc]
-        mov eax, 0xcccccccc
-        mov ecx, 0x8
-        rep stosd
+		lea edi, dword ptr es : [esp + 0xc]
+		mov eax, 0xcccccccc
+		mov ecx, 0x8
+		rep stosd
 
-        ;The variable of x
-        mov dword ptr es:[esp - 0x4], 0
-        ;The variable of y
-        mov dword ptr es:[esp - 0x8], 0
+		; The variable of x
+		mov dword ptr es : [ebp - 0x4], 0
 
-        ;The limitation of x
-        mov dword ptr es:[esp - 0xc], 40
-        ;The limitation of y
-        mov dword ptr es:[esp - 0x10], 25
+		; The variable of y
+		mov dword ptr es : [ebp - 0x8], 0
 
-        ;Initialization of the registers
-        xor ebx, ebx 
-        xor eax, eax 
+		; The limitation of x
+		mov dword ptr es : [ebp - 0xc], 4
 
-        ;start the outer loop 
-        OuterLoopStart:
-        mov ebx, dword ptr es:[esp - 0x8]
-        cmp ebx, dword ptr es:[esp - 0x10]
-        jg OutterLoopEnd
+		; The limitation of y
+		mov dword ptr es : [ebp - 0x10], 3
 
-        ;Start the inner loop
-        mov ebx, dword ptr es:[esp - 0x4]
-        cmp ebx, dword ptr es:[esp - 0xc]
-        jg InnerLoopEnd
+		; Initialization of the registers
+		xor ebx, ebx
+		xor eax, eax
 
-        inc eax
+		; start the outer loop
 
-        add dword ptr es:[esp - 0x8], 1
-        jmp InnerLoopStart
+		OuterLoopStart :
+			mov ebx, dword ptr es : [ebp - 0x8]
+			cmp ebx, dword ptr es : [ebp - 0x10]
+			jnl OuterLoopEnd
 
-        InnerLoopEnd:
+			; Clear the iter of inner loop
+			mov dword ptr es : [ebp - 0x4], 0
 
-        add dword ptr es:[esp - 0x4], 1
-        jmp OuterLoopStart
+			; Start the inner loop
+			InnerLoopStart :
+			mov ebx, dword ptr es : [ebp - 0x4]
+			cmp ebx, dword ptr es : [ebp - 0xc]
+			jnl InnerLoopEnd
 
-        OuterLoopEnd:
+			; Increment the result
+			inc eax
 
-        ;End the outer loop
+			add dword ptr es : [ebp - 0x4], 1
+			jmp InnerLoopStart
 
-        pop ebx
-        pop edi
-        pop esi
+			InnerLoopEnd :
 
-        mov esp, ebp
-        pop ebp
-        ret
-    }
+			add dword ptr es : [ebp - 0x8], 1
+			jmp OuterLoopStart
+
+			OuterLoopEnd :
+
+		; End the outer loop
+			pop ebx
+			pop edi
+			pop esi
+
+			mov esp, ebp
+			pop ebp
+			ret
+	}
 }
 
 int main(void)
 {
-    int iter = 0;
-    iter = NestedWhileLoop();
-    printf("%d\n", iter);
-    return 0;
+	int iter = 0;
+	iter = NestedWhileLoop();
+	printf("%d\n", iter);
+	return 0;
 }
