@@ -60,7 +60,7 @@ int __declspec(naked) PassPointerFree(int addr)
 
 		push esi
 		push edi
-		push esi
+		push ebx
 
 		lea edi, dword ptr es : [esp + 0xc]
 		mov eax, 0xcccccccc
