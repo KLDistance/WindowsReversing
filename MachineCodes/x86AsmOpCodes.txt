@@ -1,0 +1,133 @@
+/*
+	this is a machine code translation list of Intel x86 processor to assembly.
+*/
+
+JCC long -- 0F8x series
+
+0F 80 xx xx xx xx :	jo xxxxxxxx
+0F 81 xx xx xx xx :	jno xxxxxxxx
+0F 82 xx xx xx xx :	jb/jnae/jc xxxxxxxx
+0F 83 xx xx xx xx :	jnb/jae/jnc xxxxxxxx
+0F 84 xx xx xx xx :	jz/je xxxxxxxx
+0F 85 xx xx xx xx :	jnz/jne xxxxxxxx
+0F 86 xx xx xx xx :	jbe/jna xxxxxxxx
+0F 87 xx xx xx xx :	jnbe/ja xxxxxxxx
+0F 88 xx xx xx xx :	js xxxxxxxx
+0F 89 xx xx xx xx :	jns xxxxxxxx
+0F 8A xx xx xx xx :	jp/jpe xxxxxxxx
+0F 8B xx xx xx xx :	jnp/jpo xxxxxxxx
+0F 8C xx xx xx xx :	jl/jnge xxxxxxxx
+0F 8D xx xx xx xx :	jnl/jge xxxxxxxx
+0F 8E xx xx xx xx :	jle/jng xxxxxxxx
+0F 8F xx xx xx xx :	jnle/jg xxxxxxxx
+
+increment and decrement -- 4x series
+
+40	:	inc eax
+41	:	inc ecx 
+42	:	inc edx
+43	:	inc ebx
+44	:	inc esp
+45	:	inc ebp
+46	:	inc esi
+47	:	inc edi
+48	:	dec eax
+49	:	dec ecx
+4A	:	dec edx
+4B	:	dec ebx
+4C	:	dec esp
+4D	:	dec ebp
+4E	:	dec esi
+4F	:	dec edi
+
+push and pop -- 5x series
+
+50	:	push eax
+51	:	push ecx
+52	:	push edx
+53	:	push ebx
+54	:	push esp
+55	:	push ebp
+56	:	push esi
+57	:	push edi
+58	:	pop eax
+59	:	pop ecx
+5A	:	pop edx
+5B	:	pop ebx
+5C	:	pop esp
+5D	:	pop ebp
+5E	:	pop esi
+5F	:	pop edi
+
+JCC short -- 7x series
+
+70 xx	:	jo xx
+71 xx	:	jno xx
+72 xx	:	jb/jnae/jc xx
+73 xx	:	jnb/jae/jnc xx
+74 xx	:	jz/je xx
+75 xx	:	jnz/jne xx
+76 xx	:	jbe/jna xx
+77 xx	:	jnbe/ja xx
+78 xx	:	js xx
+79 xx	:	jns xx
+7A xx	:	jp/jpe xx
+7B xx	:	jnp/jpo xx
+7C xx	:	jl/jnge xx
+7D xx	:	jnl/jge xx
+7E xx	:	jle/jng xx
+7F xx	:	jnle/jg xx
+
+ModR/M mov -- 8x series
+
+88	:	mov Eb, Gb
+89	:	mov Ev, Gv
+8A	:	mov Gb, Eb
+8B	:	mov Gv, Ev
+
+nop -- 90
+
+90	:	nop
+
+exchange with eax -- 9x series
+91	:	xchg eax, ecx
+92	:	xchg eax, edx
+93	:	xchg eax, ebx
+94	:	xchg eax, esp
+95	:	xchg eax, ebp
+96	:	xchg eax, esi
+97	:	xchg eax, edi
+
+reg mov -- Bx series
+
+B0 xx	:	mov al, xx 
+B1 xx	:	mov cl, xx
+B2 xx	:	mov dl, xx
+B3 xx	:	mov bl, xx
+B4 xx	:	mov ah, xx
+B5 xx	:	mov ch, xx
+B6 xx	:	mov dh, xx
+B7 xx	:	mov bh, xx
+B8 xx xx xx xx	:	mov eax, xxxxxxxx
+B9 xx xx xx xx	:	mov ecx, xxxxxxxx
+BA xx xx xx xx	:	mov edx, xxxxxxxx
+BB xx xx xx xx	:	mov ebx, xxxxxxxx
+BC xx xx xx xx	:	mov esp, xxxxxxxx
+BD xx xx xx xx	:	mov ebp, xxxxxxxx
+BE xx xx xx xx	:	mov esi, xxxxxxxx
+BF xx xx xx xx	:	mov edi, xxxxxxxx
+
+loop, call and return jmps -- Cx, Ex series
+
+E0 xx	:	loopne/loopnz xx (running execute: ecx--; jump if ZF == 0 && ecx != 0)
+E1 xx	:	loope/loopz xx (running execute: ecx--; jump if ZF == 1 && ecx != 0)
+E2 xx	:	loop xx (running execute: ecx--; jump if ecx == 0)
+E3 xx	:	jrcxz xx (if x86, jrcxz == jecxz; jump if ecx == 0)
+E8 xx xx xx xx	:	call xxxxxxxx
+E9 xx xx xx xx	:	jmp xxxxxxxx
+EA cs + xx xx xx xx	:	jmp xxxxxxxx xxxx (cross segments, used in 8086 but deprecated in x86)
+EB xx	:	jmp xx
+C3	:	ret/retn (== pop eip; __cdecl)
+C2 xx xx	:	ret/retn xxxx (== pop eip, esp += xxxx; __stdcall)
+CB	:	retf (return far; hhhhmmmm llllllll, llllllll => eip, mmmm => cs)
+CA xx xx	:	retf xxxx (return far; hhhhmmmm llllllll, llllllll => eip, mmmm => cs, then esp += xxxx)
